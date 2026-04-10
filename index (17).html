@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Amoha Spelling Stars</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Georgia, serif; background: #7C3AED; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px 16px 40px; }
+  .hdr { text-align: center; margin-bottom: 12px; width: 100%; max-width: 440px; }
+  .hdr-stars { color: #F9D923; font-size: 1.2rem; letter-spacing: 6px; margin-bottom: 6px; }
+  .hdr-title { color: white; font-size: 1.7rem; font-weight: bold; }
+  .hdr-title span { color: #F9D923; }
+  .hdr-sub { color: #DDD6FE; font-size: 0.82rem; font-style: italic; margin-top: 4px; }
+  .score-bar { width: 100%; max-width: 440px; background: #6D28D9; border-radius: 10px; padding: 10px 16px; display: flex; justify-content: space-between; margin-bottom: 14px; }
+  .sc-lbl { font-size: 0.62rem; color: #DDD6FE; text-transform: uppercase; letter-spacing: 1px; text-align: center; }
+  .sc-val { font-size: 1.2rem; font-weight: bold; color: #F9D923; text-align: center; }
+  .card { background: white; border-radius: 14px; padding: 18px; width: 100%; max-width: 440px; margin-bottom: 12px; }
+  .word-num { font-size: 0.68rem; color: #A78BFA; text-transform: uppercase; letter-spacing: 2px; text-align: center; margin-bottom: 10px; }
+  .listen-area { text-align: center; margin: 10px 0; }
+  .listen-btn { background: #7C3AED; color: white; border: none; border-radius: 50%; width: 72px; height: 72px; font-size: 2rem; cursor: pointer; box-shadow: 0 4px 16px rgba(124,58,237,0.4); }
+  .listen-lbl { font-size: 0.78rem; color: #A78BFA; font-style: italic; margin-top: 6px; }
+  .rule-title { font-size: 0.65rem; color: #7C3AED; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 4px; text-align: center; }
+  .rule-text { font-size: 0.85rem; background: #EDE9FE; border-radius: 8px; padding: 10px; color: #6D28D9; text-align: center; }
+  .feedback { display: none; border-radius: 10px; padding: 12px; text-align: center; font-weight: bold; font-size: 0.95rem; margin-bottom: 12px; width: 100%; max-width: 440px; }
+  .type-lbl { font-size: 0.72rem; color: #7C3AED; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; font-weight: bold; }
+  .spell-input { width: 100%; border: 3px solid #DDD6FE; border-radius: 10px; padding: 12px; font-size: 1.5rem; text-align: center; color: #3B0764; font-weight: bold; font-family: Georgia, serif; letter-spacing: 4px; outline: none; }
+  .check-btn { margin-top: 10px; width: 100%; background: #7C3AED; color: white; border: none; border-radius: 10px; padding: 14px; font-size: 1rem; font-weight: bold; cursor: pointer; }
+  .next-btn { margin-top: 10px; width: 100%; background: #F9D923; color: #3B0764; border: none; border-radius: 10px; padding: 14px; font-size: 1.1rem; font-weight: bold; cursor: pointer; display: none; }
+  .done-card { display: none; background: white; border-radius: 14px; padding: 28px; width: 100%; max-width: 440px; text-align: center; margin-bottom: 12px; }
+  .done-title { font-size: 1.3rem; color: #7C3AED; font-weight: bold; margin-bottom: 8px; }
+  .done-msg { color: #6D28D9; margin-bottom: 16px; }
+  .restart-btn { background: #7C3AED; color: white; border: none; border-radius: 10px; padding: 12px 28px; font-size: 1rem; font-weight: bold; cursor: pointer; }
+  .star-row { color: #F9D923; font-size: 1.5rem; letter-spacing: 4px; text-align: center; margin-top: 8px; }
+  .star-msg { color: #DDD6FE; font-size: 0.78rem; text-align: center; margin-top: 4px; font-style: italic; }
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-stars">&#9733; &#9733; &#9733;</div>
+  <div class="hdr-title">Amoha&#39;s <span>Spelling Stars</span></div>
+  <div class="hdr-sub">Listen carefully, then spell the word!</div>
+</div>
+
+<div class="score-bar">
+  <div><div class="sc-lbl">Stars</div><div class="sc-val" id="starsDisp">&#9733; 0</div></div>
+  <div><div class="sc-lbl">Word</div><div class="sc-val" id="doneDisp">1 of 2</div></div>
+  <div><div class="sc-lbl">Mastered</div><div class="sc-val" id="mastDisp">&#10003; 0</div></div>
+</div>
+
+<div class="card" id="wordCard">
+  <div class="word-num" id="wordNum">Word 1 of 2</div>
+  <div class="listen-area">
+    <button class="listen-btn" id="listenBtn">&#9654;</button>
+    <div class="listen-lbl">Tap to hear the word</div>
+  </div>
+  <div class="rule-title" id="rTitle"></div>
+  <div class="rule-text" id="rText"></div>
+</div>
+
+<div class="feedback" id="feedbackBox"></div>
+
+<div class="card" id="typeCard">
+  <div class="type-lbl" id="typeLabel">Now spell the word</div>
+  <input class="spell-input" type="text" id="inp"
+    placeholder="type here"
+    autocomplete="off" autocorrect="off"
+    autocapitalize="off" spellcheck="false" />
+  <button class="check-btn" id="checkBtn">Check My Spelling</button>
+  <button class="next-btn" id="nextBtn">Next Word</button>
+</div>
+
+<div class="done-card" id="doneCard">
+  <div class="done-title">&#9733; Well done Amoha! &#9733;</div>
+  <div class="done-msg" id="doneMsg"></div>
+  <button class="restart-btn" id="restartBtn">Play Again</button>
+</div>
+
+<div class="star-row" id="starRow">&#9734; &#9734; &#9734; &#9734; &#9734;</div>
+<div class="star-msg" id="starMsg">Earn stars by spelling correctly!</div>
+
+<script>
+var W = [
+  { word: "back",  audio: "back",  rule: "Rule 25", ruleText: "CK only after a single short vowel" },
+  { word: "ball",  audio: "ball",  rule: "Rule 21", ruleText: "ALL alone has two Ls" },
+  { word: "call",  audio: "call",  rule: "Rule 21", ruleText: "ALL alone has two Ls" },
+  { word: "fall",  audio: "fall",  rule: "Rule 21", ruleText: "ALL alone has two Ls" },
+  { word: "tall",  audio: "tall",  rule: "Rule 21", ruleText: "ALL alone has two Ls" },
+  { word: "wall",  audio: "wall",  rule: "Rule 21", ruleText: "ALL alone has two Ls" },
+  { word: "small", audio: "small", rule: "Rule 21", ruleText: "ALL alone has two Ls" },
+  { word: "came",  audio: "came",  rule: "Rule 7",  ruleText: "Silent final E makes the vowel say its name" },
+  { word: "make",  audio: "make",  rule: "Rule 7",  ruleText: "Silent final E makes the vowel say its name" },
+  { word: "made",  audio: "made",  rule: "Rule 7",  ruleText: "Silent final E makes the vowel say its name" }
+];
+
+var idx = 0;
+var copy = false;
+var score = 0;
+var mastered = 0;
+var streaks = {};
+var curAudio = null;
+
+function load(n) {
+  idx = n;
+  copy = false;
+  if (idx >= W.length) {
+    document.getElementById("doneCard").style.display = "block";
+    document.getElementById("wordCard").style.display = "none";
+    document.getElementById("feedbackBox").style.display = "none";
+    document.getElementById("typeCard").style.display = "none";
+    document.getElementById("doneMsg").textContent = "You got " + score + " star" + (score === 1 ? "" : "s") + " and mastered " + mastered + " word" + (mastered === 1 ? "" : "s") + ". Amazing!";
+    return;
+  }
+  var w = W[idx];
+  document.getElementById("wordNum").textContent = "Word " + (idx + 1) + " of " + W.length;
+  document.getElementById("rTitle").textContent = w.rule;
+  document.getElementById("rText").textContent = w.ruleText;
+  document.getElementById("doneDisp").textContent = (idx + 1) + " of " + W.length;
+  var inp = document.getElementById("inp");
+  inp.value = "";
+  inp.style.borderColor = "#DDD6FE";
+  inp.style.background = "white";
+  document.getElementById("feedbackBox").style.display = "none";
+  document.getElementById("checkBtn").style.display = "block";
+  document.getElementById("checkBtn").textContent = "Check My Spelling";
+  document.getElementById("nextBtn").style.display = "none";
+  document.getElementById("typeLabel").textContent = "Now spell the word";
+  document.getElementById("typeCard").style.display = "block";
+  document.getElementById("wordCard").style.display = "block";
+}
+
+function playWord() {
+  var audioFile = W[idx].audio;
+  var btn = document.getElementById("listenBtn");
+  if (curAudio) {
+    curAudio.pause();
+    curAudio.src = "";
+    curAudio = null;
+  }
+  var ts = new Date().getTime();
+  curAudio = new Audio(audioFile + ".m4a?" + ts);
+  btn.style.background = "#6D28D9";
+  curAudio.play();
+  curAudio.onended = function() { btn.style.background = "#7C3AED"; };
+  curAudio.onerror = function() { btn.style.background = "#7C3AED"; };
+}
+
+function fb(bg, col, msg) {
+  var b = document.getElementById("feedbackBox");
+  b.style.display = "block";
+  b.style.background = bg;
+  b.style.color = col;
+  b.style.border = "2px solid " + col;
+  b.textContent = msg;
+}
+
+function check() {
+  var typed = document.getElementById("inp").value.trim().toLowerCase();
+  if (typed === "") return;
+  var w = W[idx].word;
+
+  if (copy) {
+    if (typed === w) {
+      document.getElementById("inp").style.borderColor = "#16a34a";
+      document.getElementById("inp").style.background = "#f0fdf4";
+      fb("#EDE9FE", "#6D28D9", "Good work! Moving on...");
+      document.getElementById("checkBtn").style.display = "none";
+      document.getElementById("nextBtn").style.display = "none";
+      copy = false;
+      var goTo = idx + 1;
+      window.setTimeout(function() { load(goTo); }, 1500);
+    } else {
+      document.getElementById("inp").value = "";
+      fb("#fee2e2", "#b91c1c", "Try again -- type: " + w);
+    }
+    return;
+  }
+
+  if (typed === w) {
+    document.getElementById("inp").style.borderColor = "#16a34a";
+    document.getElementById("inp").style.background = "#f0fdf4";
+    score++;
+    if (!streaks[w]) streaks[w] = 0;
+    streaks[w]++;
+    if (streaks[w] >= 2) mastered++;
+    updateScore();
+    fb("#dcfce7", "#15803d", "Brilliant! That is correct!");
+    document.getElementById("checkBtn").style.display = "none";
+    document.getElementById("nextBtn").style.display = "none";
+    var goTo = idx + 1;
+    window.setTimeout(function() { load(goTo); }, 1800);
+  } else {
+    if (!streaks[w]) streaks[w] = 0;
+    streaks[w] = 0;
+    fb("#fee2e2", "#b91c1c", "Not quite! Correct spelling: " + w + ". Now type it correctly below.");
+    document.getElementById("inp").value = "";
+    document.getElementById("inp").style.borderColor = "#DDD6FE";
+    document.getElementById("inp").style.background = "white";
+    document.getElementById("typeLabel").textContent = "Type the correct spelling once";
+    document.getElementById("checkBtn").textContent = "Done";
+    copy = true;
+  }
+}
+
+function updateScore() {
+  document.getElementById("starsDisp").innerHTML = "&#9733; " + score;
+  document.getElementById("mastDisp").innerHTML = "&#10003; " + mastered;
+  var row = "";
+  for (var i = 0; i < 5; i++) { row += i < score ? "&#9733;" : "&#9734;"; }
+  document.getElementById("starRow").innerHTML = row;
+  document.getElementById("starMsg").textContent = score === 0 ? "Earn stars by spelling correctly!" : score + " star" + (score === 1 ? "" : "s") + " earned -- keep going!";
+}
+
+document.getElementById("listenBtn").onclick = function() { playWord(); };
+document.getElementById("checkBtn").onclick = function() { check(); };
+document.getElementById("nextBtn").onclick = function() { load(idx + 1); };
+document.getElementById("restartBtn").onclick = function() {
+  score = 0; mastered = 0; streaks = {};
+  updateScore();
+  document.getElementById("doneCard").style.display = "none";
+  load(0);
+};
+document.getElementById("inp").onkeydown = function(e) { if (e.keyCode === 13) { e.preventDefault(); check(); } };
+
+load(0);
+</script>
+</body>
+</html>
